@@ -758,16 +758,66 @@
             const locateMe = () => { alert("地圖功能已移除"); };
             const selectDate = (date) => { selectedDate.value = date; }; 
 
-            // --- CRUD Actions ---
-            const openModal = () => { isEditing.value = false; modalEvent.value = { title: '', time: '09:00', type: 'sight', location: '', cost: '', note: '' }; showModal.value = true; };
-            const editEvent = (item) => { isEditing.value = true; editingId.value = item.id; modalEvent.value = { ...item }; showModal.value = true; };
+            // Trip Status & Countdown Logic
+            const today = new Date();
+            today.setHours(0,0,0,0);
+            const tripStart = new Date('2026-03-10');
+            const tripEnd = new Date('2026-03-24');
+            const purchaseDate = new Date('2025-11-14'); 
+
+            const tripStatus = computed(() => {
+                if (today < tripStart) return 'before';
+                if (today >= tripStart && today <= tripEnd) return 'during';
+                return 'after';
+            });
+
+            const countdownDays = computed(() => {
+                 const diffTime = tripStart - today;
+                 return Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
+            });
+
+            const countdownProgress = computed(() => {
+                const total = tripStart - purchaseDate;
+                const current = today - purchaseDate;
+                
+                if (current < 0) return 0;
+                if (current > total) return 100;
+                return (current / total) * 100;
+            });
+
+            const currentDayNum = computed(() => {
+                const diffTime = Math.abs(today - tripStart);
+                return Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+            });
+
+            const tripProgress = computed(() => {
+                 const total = tripEnd - tripStart;
+                 const current = today - tripStart;
+                 return (current / total) * 100;
+            });
+
+            // --- CRUD Actions (Fixed) ---
+            const openModal = () => { 
+                isEditing.value = false; 
+                modalEvent.value = { title: '', time: '09:00', type: 'sight', location: '', cost: '', note: '' }; 
+                showModal.value = true; 
+            };
+            const editEvent = (item) => { 
+                isEditing.value = true; 
+                editingId.value = item.id; 
+                modalEvent.value = JSON.parse(JSON.stringify(item)); // Deep copy
+                showModal.value = true; 
+            };
             const saveEvent = () => {
                 if (!modalEvent.value.title) return;
                 const dateKey = selectedDate.value.full;
                 if (!itineraryData.value[dateKey]) itineraryData.value[dateKey] = [];
+                
                 if (isEditing.value) {
                     const index = itineraryData.value[dateKey].findIndex(e => e.id === editingId.value);
-                    if (index !== -1) itineraryData.value[dateKey][index] = { ...itineraryData.value[dateKey][index], ...modalEvent.value };
+                    if (index !== -1) {
+                        itineraryData.value[dateKey][index] = { ...modalEvent.value }; // Replace
+                    }
                 } else {
                     itineraryData.value[dateKey].push({ id: Date.now(), ...modalEvent.value });
                 }
@@ -775,9 +825,11 @@
                 showModal.value = false;
             };
             const deleteEvent = (index) => {
-                const dateKey = selectedDate.value.full;
-                itineraryData.value[dateKey].splice(index, 1);
-                saveData('itinerary', itineraryData.value);
+                if(confirm("確定刪除此行程？")) {
+                    const dateKey = selectedDate.value.full;
+                    itineraryData.value[dateKey].splice(index, 1);
+                    saveData('itinerary', itineraryData.value);
+                }
             };
 
             const handleExpenseImage = async (e, isEdit = false) => { 
@@ -787,13 +839,18 @@
             const addExpense = () => {
                 if (!newExpense.value.amount || !newExpense.value.title) return;
                 const exp = { ...newExpense.value, date: new Date().toLocaleDateString(), id: Date.now() };
-                expenses.value.unshift(exp); saveData('expenses', expenses.value); newExpense.value = { amount: '', title: '', payer: newExpense.value.payer, image: null };
+                expenses.value.unshift(exp); 
+                saveData('expenses', expenses.value); 
+                newExpense.value = { amount: '', title: '', payer: newExpense.value.payer, image: null };
             };
+            
+            // Fixed Edit Expense
             const initEditExpense = (expense) => { 
+                // Find index in the original array by ID (safest)
                 const idx = expenses.value.findIndex(e => e.id === expense.id); 
                 if (idx !== -1) { 
                     editingExpenseIndex.value = idx; 
-                    editingExpense.value = JSON.parse(JSON.stringify(expenses.value[idx])); // Deep copy
+                    editingExpense.value = JSON.parse(JSON.stringify(expenses.value[idx])); 
                     showExpenseEditModal.value = true; 
                 } 
             };
@@ -805,48 +862,77 @@
                 } 
             };
             const deleteExpense = () => { 
-                if (editingExpenseIndex.value !== -1) { 
-                    expenses.value.splice(editingExpenseIndex.value, 1); 
-                    saveData('expenses', expenses.value); 
-                    showExpenseEditModal.value = false; 
-                } 
+                if(confirm("確定要刪除這筆消費嗎？")) { // Added alert
+                    if (editingExpenseIndex.value !== -1) { 
+                        expenses.value.splice(editingExpenseIndex.value, 1); 
+                        saveData('expenses', expenses.value); 
+                        showExpenseEditModal.value = false; 
+                    }
+                }
             };
 
             const addListItem = () => { if(!newItemInput.value) return; lists.value[currentList.value].push({ text: newItemInput.value, done: false, assignee: newItemAssignee.value }); newItemInput.value = ''; saveData('lists', lists.value); };
             const toggleListItem = (idx) => { const item = lists.value[currentList.value][idx]; item.done = !item.done; saveData('lists', lists.value); };
             const deleteListItem = (idx) => { lists.value[currentList.value].splice(idx, 1); saveData('lists', lists.value); };
 
-            const addNewAccommodation = () => { const n = prompt("飯店名稱:"); if(n) { accommodations.value.push({ city: '新住宿', name: n, address: '地址待補', checkIn: '15:00', ref: '-' }); saveData('accommodations', accommodations.value); }};
-            const editAccommodation = (idx) => { const h = accommodations.value[idx]; const n = prompt("編輯飯店名稱:", h.name); if(n) { h.name = n; h.ref = prompt("訂單編號:", h.ref)||h.ref; saveData('accommodations', accommodations.value); }};
-            const deleteAccommodation = (idx) => { if(confirm("確定刪除此住宿？")) { accommodations.value.splice(idx, 1); saveData('accommodations', accommodations.value); }};
-
-            const editCar = (index) => { 
-                if (typeof index === 'number') {
-                     // Editing existing car (from list) - if you had a list
-                     // But here we treat carRental as single object usually, or if you have array:
-                     // If carRentals is array:
-                     // editingCarIndex.value = index; 
-                     // editingCar.value = { ...carRentals.value[index] };
-                     
-                     // For single object mode as per current UI:
-                     editingCar.value = { ...carRental.value };
-                } else {
-                    // Edit single instance
-                    editingCar.value = { ...carRental.value };
+            // Accommodations Logic (Fixed)
+            const addNewAccommodation = () => { 
+                const n = prompt("飯店名稱:"); 
+                if(n) { 
+                    accommodations.value.push({ city: '新住宿', name: n, address: '地址待補', checkIn: '15:00', ref: '-' }); 
+                    saveData('accommodations', accommodations.value); 
                 }
+            };
+            const editAccommodation = (idx) => { 
+                const h = accommodations.value[idx]; 
+                const n = prompt("編輯飯店名稱:", h.name); 
+                if(n) { 
+                    h.name = n; 
+                    h.ref = prompt("訂單編號:", h.ref)||h.ref; 
+                    h.city = prompt("城市:", h.city)||h.city;
+                    h.checkIn = prompt("Check-in 時間:", h.checkIn)||h.checkIn;
+                    saveData('accommodations', accommodations.value); 
+                }
+            };
+            const deleteAccommodation = (idx) => { 
+                if(confirm("確定刪除此住宿？")) { 
+                    accommodations.value.splice(idx, 1); 
+                    saveData('accommodations', accommodations.value); 
+                }
+            };
+
+            // Car Rental Logic
+            const initAddCar = () => {
+                editingCarIndex.value = -1; // New
+                editingCar.value = { company: '', carModel: '', pickupDate: '', pickupLocation: '', returnDate: '', returnLocation: '', price: '', ref: '' };
+                showCarEditModal.value = true;
+            };
+            // Check if editing existing single object or adding to list? 
+            // Assuming single object based on previous req, but let's support basic object update
+            const editCar = () => { 
+                // For single car rental object structure
+                editingCar.value = JSON.parse(JSON.stringify(carRental.value));
                 showCarEditModal.value = true; 
             };
-            
             const saveCarChanges = () => { 
                 carRental.value = { ...editingCar.value }; 
                 saveData('carRental', carRental.value); 
                 showCarEditModal.value = false; 
             };
+            
+            // Flight Edit
+            const initEditFlight = (index) => {
+                passwordAction.value = 'flight_edit';
+                passwordPayload.value = index;
+                passwordInput.value = '';
+                showPasswordModal.value = true;
+            };
 
             const performProtectedAction = () => {
                 if (passwordAction.value === 'flight_edit') { 
                     editingFlightIndex.value = passwordPayload.value; 
-                    editingFlight.value = { ...flightData.value[passwordPayload.value] }; 
+                    // Deep copy to prevent direct mutation
+                    editingFlight.value = JSON.parse(JSON.stringify(flightData.value[passwordPayload.value])); 
                     showFlightEditModal.value = true; 
                 }
                 else if (passwordAction.value === 'add_member') { 
@@ -855,25 +941,57 @@
                     showMemberModal.value = true; 
                 }
                 else if (passwordAction.value === 'delete_member') { 
-                    members.value.splice(passwordPayload.value, 1); 
-                    saveData('members', members.value); 
+                    // Delete member directly after password check
+                    const idx = passwordPayload.value;
+                    if (idx > -1 && idx < members.value.length) {
+                        members.value.splice(idx, 1); 
+                        saveData('members', members.value); 
+                    }
                 }
             };
             const checkPassword = () => { if (passwordInput.value === '007') { showPasswordModal.value = false; performProtectedAction(); } else { passwordShake.value = true; setTimeout(() => passwordShake.value = false, 500); passwordInput.value = ''; } };
-            const initEditFlight = (index) => { passwordAction.value = 'flight_edit'; passwordPayload.value = index; passwordInput.value = ''; showPasswordModal.value = true; };
-            const saveFlightChanges = () => { if (editingFlightIndex.value !== -1) { flightData.value[editingFlightIndex.value] = { ...editingFlight.value }; saveData('flights', flightData.value); } showFlightEditModal.value = false; };
+            
+            const saveFlightChanges = () => { 
+                if (editingFlightIndex.value !== -1) { 
+                    flightData.value[editingFlightIndex.value] = { ...editingFlight.value }; 
+                    saveData('flights', flightData.value); 
+                    showFlightEditModal.value = false; 
+                } 
+            };
+            
+            // Member Actions (Fixed)
             const initAddMember = () => { passwordAction.value = 'add_member'; passwordInput.value = ''; showPasswordModal.value = true; };
             const initDeleteMember = (index) => { passwordAction.value = 'delete_member'; passwordPayload.value = index; passwordInput.value = ''; showPasswordModal.value = true; };
-            const editMember = (member, index) => { isNewMember.value = false; editingMemberIndex.value = index; editingMember.value = { ...member }; showMemberModal.value = true; };
+            const editMember = (member, index) => { 
+                isNewMember.value = false; 
+                editingMemberIndex.value = index; 
+                editingMember.value = JSON.parse(JSON.stringify(member)); 
+                showMemberModal.value = true; 
+            };
             const handleMemberAvatar = async (e) => { const f = e.target.files[0]; if(f) { try { const url = await compressImage(f); editingMember.value.avatar = url; } catch (err) { alert("圖片處理失敗"); } } };
             const saveMember = () => {
                 if (!editingMember.value.name) return;
-                if (isNewMember.value) { if (members.value.some(m => m.name === editingMember.value.name)) { alert("成員名稱重複"); return; } members.value.push({ ...editingMember.value }); }
-                else {
-                    const oldName = members.value[editingMemberIndex.value].name; const newName = editingMember.value.name; members.value[editingMemberIndex.value] = { ...editingMember.value };
-                    if (oldName !== newName) { expenses.value.forEach(exp => { if (exp.payer === oldName) exp.payer = newName; }); saveData('expenses', expenses.value); Object.keys(lists.value).forEach(k => lists.value[k].forEach(i => { if (i.assignee === oldName) i.assignee = newName; })); saveData('lists', lists.value); }
+                
+                if (isNewMember.value) { 
+                    if (members.value.some(m => m.name === editingMember.value.name)) { alert("成員名稱重複"); return; } 
+                    members.value.push({ ...editingMember.value }); 
+                } else {
+                    const oldName = members.value[editingMemberIndex.value].name; 
+                    const newName = editingMember.value.name; 
+                    
+                    // Update member
+                    members.value[editingMemberIndex.value] = { ...editingMember.value };
+                    
+                    // Update related data if name changed
+                    if (oldName !== newName) { 
+                        expenses.value.forEach(exp => { if (exp.payer === oldName) exp.payer = newName; }); 
+                        saveData('expenses', expenses.value); 
+                        Object.keys(lists.value).forEach(k => lists.value[k].forEach(i => { if (i.assignee === oldName) i.assignee = newName; })); 
+                        saveData('lists', lists.value); 
+                    }
                 }
-                saveData('members', members.value); showMemberModal.value = false;
+                saveData('members', members.value); 
+                showMemberModal.value = false;
             };
 
             const initAddJournal = () => { isEditingJournal.value = false; const todayStr = new Date().toISOString().split('T')[0]; journalForm.value = { id: Date.now(), date: todayStr, author: members.value[0]?.name || '', content: '', photos: [] }; showJournalModal.value = true; };
@@ -908,14 +1026,6 @@
 
             watch(currentTab, () => { if(!isOnlineMode.value) forceRefreshData(); });
 
-            const today = new Date(); today.setHours(0,0,0,0);
-            const tripStart = new Date('2026-03-10'); const tripEnd = new Date('2026-03-24');
-            const tripStatus = computed(() => { if (today < tripStart) return 'before'; if (today >= tripStart && today <= tripEnd) return 'during'; return 'after'; });
-            const countdownDays = computed(() => Math.ceil(Math.abs(tripStart - today) / (1000 * 60 * 60 * 24)));
-            const countdownProgress = computed(() => { const pStart = new Date(tripStart); pStart.setDate(tripStart.getDate() - 100); const total = tripStart - pStart; const current = today - pStart; if (current < 0) return 0; if (current > total) return 100; return (current / total) * 100; });
-            const currentDayNum = computed(() => Math.ceil(Math.abs(today - tripStart) / (1000 * 60 * 60 * 24)) + 1);
-            const tripProgress = computed(() => { const total = tripEnd - tripStart; const current = today - tripStart; return (current / total) * 100; });
-
             return {
                 currentTab, tripDates, selectedDate, selectDate, currentItinerary,
                 showModal, isEditing, modalEvent, openModal, editEvent, saveEvent, deleteEvent,
@@ -929,7 +1039,7 @@
                 showExpenseEditModal, editingExpense, initEditExpense, saveExpenseChanges, deleteExpense,
                 isLoading, isOnlineMode, forceRefreshData,
                 expenseFilter, filteredExpenses,
-                bookingSubTab, carRental, editCar, saveCarChanges, editingCar, showCarEditModal,
+                bookingSubTab, carRental, editCar, saveCarChanges, editingCar, showCarEditModal, initAddCar,
                 tripStatus, countdownDays, countdownProgress, currentDayNum, tripProgress,
                 // Journal
                 journals, showJournalModal, isEditingJournal, journalForm, initAddJournal, editJournal, handleJournalImages, removeJournalPhoto, saveJournal, deleteJournal,
