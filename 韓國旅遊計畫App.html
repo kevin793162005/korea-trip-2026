@@ -44,12 +44,11 @@
         html, body {
             height: 100%;
             width: 100%;
-            overflow: hidden; /* 防止捲動彈性效果露出背景 */
+            overflow: hidden;
             font-family: 'Noto Sans TC', sans-serif;
             -webkit-tap-highlight-color: transparent;
             background-color: #1F1D2B;
             color: #E2E8F0;
-            /* iOS 彈性滾動優化 */
             -webkit-overflow-scrolling: touch; 
             user-select: none;
             -webkit-user-select: none;
@@ -72,7 +71,8 @@
         ::placeholder { color: #6B7280; opacity: 0.6; }
 
         /* Safe Area Padding (適配 iPhone X+ 瀏海與底部橫條) */
-        .safe-pb { padding-bottom: env(safe-area-inset-bottom); }
+        /* 增加 env() 的處理，確保有足夠空間 */
+        .safe-pb { padding-bottom: calc(env(safe-area-inset-bottom) + 10px); } 
         .safe-pt { padding-top: env(safe-area-inset-top); }
         
         /* 安裝提示動畫 */
@@ -89,7 +89,7 @@
 
 <div id="app" class="h-full w-full flex flex-col lg:flex-row lg:p-8 lg:gap-8 lg:max-w-7xl lg:mx-auto relative bg-[#1F1D2B]">
 
-    <!-- PWA 安裝提示 (僅在非 standalone 模式且手機版顯示) -->
+    <!-- PWA 安裝提示 -->
     <div v-if="showInstallPrompt" class="fixed bottom-0 left-0 right-0 bg-[#2F2B3E] border-t border-white/10 p-4 z-[1001] install-prompt lg:hidden safe-pb">
         <div class="flex items-center justify-between">
             <div class="flex items-center gap-3">
@@ -131,46 +131,30 @@
             </div>
             <div>
                 <h1 class="text-xl font-bold text-[#FFD1A4] tracking-wide">北國猛男</h1>
-                <p class="text-xs text-slate-400">2026 釜山・濟州</p>
+                <p class="text-xs text-slate-400">2026 釜山・濟州 15日遊</p>
             </div>
         </div>
 
         <nav class="space-y-2 flex-1">
-            <button @click="currentTab = 'schedule'" class="w-full text-left px-4 py-3 rounded-xl flex items-center gap-3 transition-colors font-medium text-slate-300 hover:bg-[#2F2B3E] hover:text-white" :class="{'desktop-nav-active font-bold': currentTab === 'schedule'}">
-                <i class="fa-solid fa-calendar-day w-6 text-center"></i> 行程規劃
-            </button>
-            <button @click="currentTab = 'bookings'" class="w-full text-left px-4 py-3 rounded-xl flex items-center gap-3 transition-colors font-medium text-slate-300 hover:bg-[#2F2B3E] hover:text-white" :class="{'desktop-nav-active font-bold': currentTab === 'bookings'}">
-                <i class="fa-solid fa-book-bookmark w-6 text-center"></i> 我的預訂
-            </button>
-            <button @click="currentTab = 'expense'" class="w-full text-left px-4 py-3 rounded-xl flex items-center gap-3 transition-colors font-medium text-slate-300 hover:bg-[#2F2B3E] hover:text-white" :class="{'desktop-nav-active font-bold': currentTab === 'expense'}">
-                <i class="fa-solid fa-wallet w-6 text-center"></i> 記帳分帳
-            </button>
-            <button @click="currentTab = 'journal'" class="w-full text-left px-4 py-3 rounded-xl flex items-center gap-3 transition-colors font-medium text-slate-300 hover:bg-[#2F2B3E] hover:text-white" :class="{'desktop-nav-active font-bold': currentTab === 'journal'}">
-                <i class="fa-solid fa-pen-nib w-6 text-center"></i> 旅行日誌
-            </button>
-            <button @click="currentTab = 'planning'" class="w-full text-left px-4 py-3 rounded-xl flex items-center gap-3 transition-colors font-medium text-slate-300 hover:bg-[#2F2B3E] hover:text-white" :class="{'desktop-nav-active font-bold': currentTab === 'planning'}">
-                <i class="fa-solid fa-suitcase w-6 text-center"></i> 行前準備
-            </button>
-            <button @click="currentTab = 'members'" class="w-full text-left px-4 py-3 rounded-xl flex items-center gap-3 transition-colors font-medium text-slate-300 hover:bg-[#2F2B3E] hover:text-white" :class="{'desktop-nav-active font-bold': currentTab === 'members'}">
-                <i class="fa-solid fa-users w-6 text-center"></i> 成員管理
-            </button>
+            <button @click="currentTab = 'schedule'" class="w-full text-left px-4 py-3 rounded-xl flex items-center gap-3 transition-colors font-medium text-slate-300 hover:bg-[#2F2B3E] hover:text-white" :class="{'desktop-nav-active font-bold': currentTab === 'schedule'}"><i class="fa-solid fa-calendar-day w-6 text-center"></i> 行程規劃</button>
+            <button @click="currentTab = 'bookings'" class="w-full text-left px-4 py-3 rounded-xl flex items-center gap-3 transition-colors font-medium text-slate-300 hover:bg-[#2F2B3E] hover:text-white" :class="{'desktop-nav-active font-bold': currentTab === 'bookings'}"><i class="fa-solid fa-book-bookmark w-6 text-center"></i> 我的預訂</button>
+            <button @click="currentTab = 'expense'" class="w-full text-left px-4 py-3 rounded-xl flex items-center gap-3 transition-colors font-medium text-slate-300 hover:bg-[#2F2B3E] hover:text-white" :class="{'desktop-nav-active font-bold': currentTab === 'expense'}"><i class="fa-solid fa-wallet w-6 text-center"></i> 記帳分帳</button>
+            <button @click="currentTab = 'journal'" class="w-full text-left px-4 py-3 rounded-xl flex items-center gap-3 transition-colors font-medium text-slate-300 hover:bg-[#2F2B3E] hover:text-white" :class="{'desktop-nav-active font-bold': currentTab === 'journal'}"><i class="fa-solid fa-pen-nib w-6 text-center"></i> 旅行日誌</button>
+            <button @click="currentTab = 'planning'" class="w-full text-left px-4 py-3 rounded-xl flex items-center gap-3 transition-colors font-medium text-slate-300 hover:bg-[#2F2B3E] hover:text-white" :class="{'desktop-nav-active font-bold': currentTab === 'planning'}"><i class="fa-solid fa-suitcase w-6 text-center"></i> 行前準備</button>
+            <button @click="currentTab = 'members'" class="w-full text-left px-4 py-3 rounded-xl flex items-center gap-3 transition-colors font-medium text-slate-300 hover:bg-[#2F2B3E] hover:text-white" :class="{'desktop-nav-active font-bold': currentTab === 'members'}"><i class="fa-solid fa-users w-6 text-center"></i> 成員管理</button>
         </nav>
-
+        
         <div class="mt-auto pt-4 border-t border-slate-600/30 flex-shrink-0">
-            <div class="text-xs text-slate-500 text-center">
-                <p>PC Mode Enabled</p>
-                <p class="mt-1">由007設計</p>
-            </div>
+            <div class="text-xs text-slate-500 text-center"><p>PC Mode Enabled</p><p class="mt-1">由007設計</p></div>
         </div>
     </aside>
 
     <!-- MAIN CONTENT AREA -->
     <main class="flex-1 flex flex-col h-full overflow-hidden lg:bg-transparent lg:max-w-none w-full min-w-0">
 
-        <!-- MOBILE Header -->
-        <!-- 修正：加入 safe-pt (padding-top: env(safe-area-inset-top)) 避開瀏海 -->
-        <!-- 額外增加 pt-5 確保有足夠的緩衝空間 -->
-        <header class="flex-shrink-0 lg:hidden pt-5 pb-2 px-6 bg-[#252331] rounded-b-[2rem] soft-shadow z-30 relative border-b border-white/5 safe-pt">
+        <!-- MOBILE Header (Fixed Top) -->
+        <!-- 修改：pt-12 大幅增加頂部 padding (約 48px) + safe-pt -->
+        <header class="flex-shrink-0 lg:hidden pt-12 pb-2 px-6 bg-[#252331] rounded-b-[2rem] soft-shadow z-30 relative border-b border-white/5 safe-pt transition-all">
             <div class="flex justify-between items-center mb-4">
                 <div>
                     <h1 class="text-2xl font-bold text-[#FFD1A4] tracking-wide">北國猛男哈米達</h1>
@@ -198,31 +182,21 @@
         </header>
 
         <!-- SCROLLABLE CONTENT AREA -->
-        <!-- 修正：safe-pb 確保底部內容不被 Home Bar 擋住 -->
-        <div class="flex-1 overflow-y-auto custom-scroll px-5 py-4 pb-24 lg:px-0 lg:py-0 lg:pb-0 safe-pb" id="content-area">
+        <!-- 修改：pb-40 大幅增加底部 padding (約 160px)，確保內容完全不被擋住 -->
+        <div class="flex-1 overflow-y-auto custom-scroll px-5 py-4 pb-40 lg:px-0 lg:py-0 lg:pb-0 safe-pb" id="content-area">
 
             <!-- DESKTOP Date Scroller -->
             <div v-if="currentTab === 'schedule'" class="hidden lg:block bg-[#252331] p-6 rounded-3xl soft-shadow mb-6 border border-white/5">
                 <h2 class="text-lg font-bold text-white mb-4 px-2">選擇日期</h2>
                 <div class="space-y-6">
-                    <!-- Busan Row -->
-                    <div>
-                        <div class="flex items-center gap-2 mb-2 px-2"><span class="w-2 h-2 rounded-full bg-sky-400"></span><h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest">Busan 釜山</h3></div>
+                    <div><div class="flex items-center gap-2 mb-2 px-2"><span class="w-2 h-2 rounded-full bg-sky-400"></span><h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest">Busan 釜山</h3></div>
                         <div class="flex space-x-3 overflow-x-auto no-scrollbar pb-2">
-                            <div v-for="date in tripDates.filter(d => d.full <= '2026-03-16')" :key="date.full" @click="selectDate(date)" class="flex-shrink-0 flex flex-col items-center justify-center w-16 h-20 rounded-2xl transition-all duration-300 cursor-pointer border hover:bg-[#3E3A52]" 
-                                 :class="selectedDate.full === date.full ? 'bg-[#FFD1A4] text-[#2F2B43] border-[#FFD1A4] shadow-lg ring-2 ring-offset-2 ring-[#FFD1A4]/50' : 'bg-[#262336] border-[#4E4868] text-slate-400'">
-                                <span class="text-[10px] font-bold opacity-80 mb-1">Day {{ date.dayNum }}</span><span class="text-xl font-bold leading-none">{{ date.day }}</span><span class="text-xs font-medium mt-1">{{ date.weekday }}</span>
-                            </div>
+                            <div v-for="date in tripDates.filter(d => d.full <= '2026-03-16')" :key="date.full" @click="selectDate(date)" class="flex-shrink-0 flex flex-col items-center justify-center w-16 h-20 rounded-2xl transition-all duration-300 cursor-pointer border hover:bg-[#3E3A52]" :class="selectedDate.full === date.full ? 'bg-[#FFD1A4] text-[#2F2B43] border-[#FFD1A4] shadow-lg ring-2 ring-offset-2 ring-[#FFD1A4]/50' : 'bg-[#262336] border-[#4E4868] text-slate-400'"><span class="text-[10px] font-bold opacity-80 mb-1">Day {{ date.dayNum }}</span><span class="text-xl font-bold leading-none">{{ date.day }}</span><span class="text-xs font-medium mt-1">{{ date.weekday }}</span></div>
                         </div>
                     </div>
-                    <!-- Jeju Row -->
-                    <div>
-                         <div class="flex items-center gap-2 mb-2 px-2"><span class="w-2 h-2 rounded-full bg-orange-400"></span><h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest">Jeju 濟州</h3></div>
+                    <div><div class="flex items-center gap-2 mb-2 px-2"><span class="w-2 h-2 rounded-full bg-orange-400"></span><h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest">Jeju 濟州</h3></div>
                         <div class="flex space-x-3 overflow-x-auto no-scrollbar pb-2">
-                            <div v-for="date in tripDates.filter(d => d.full > '2026-03-16')" :key="date.full" @click="selectDate(date)" class="flex-shrink-0 flex flex-col items-center justify-center w-16 h-20 rounded-2xl transition-all duration-300 cursor-pointer border hover:bg-[#3E3A52]" 
-                                 :class="selectedDate.full === date.full ? 'bg-[#FFD1A4] text-[#2F2B43] border-[#FFD1A4] shadow-lg ring-2 ring-offset-2 ring-[#FFD1A4]/50' : 'bg-[#262336] border-[#4E4868] text-slate-400'">
-                                <span class="text-[10px] font-bold opacity-80 mb-1">Day {{ date.dayNum }}</span><span class="text-xl font-bold leading-none">{{ date.day }}</span><span class="text-xs font-medium mt-1">{{ date.weekday }}</span>
-                            </div>
+                            <div v-for="date in tripDates.filter(d => d.full > '2026-03-16')" :key="date.full" @click="selectDate(date)" class="flex-shrink-0 flex flex-col items-center justify-center w-16 h-20 rounded-2xl transition-all duration-300 cursor-pointer border hover:bg-[#3E3A52]" :class="selectedDate.full === date.full ? 'bg-[#FFD1A4] text-[#2F2B43] border-[#FFD1A4] shadow-lg ring-2 ring-offset-2 ring-[#FFD1A4]/50' : 'bg-[#262336] border-[#4E4868] text-slate-400'"><span class="text-[10px] font-bold opacity-80 mb-1">Day {{ date.dayNum }}</span><span class="text-xl font-bold leading-none">{{ date.day }}</span><span class="text-xs font-medium mt-1">{{ date.weekday }}</span></div>
                         </div>
                     </div>
                 </div>
@@ -263,12 +237,10 @@
                 </div>
             </div>
             
-            <!-- Other Tabs (Simplified for brevity, but included in full logic below) -->
+            <!-- Other Tabs (Simplified, Full Logic Below) -->
              <div v-if="currentTab === 'bookings'" class="space-y-5">
                 <div class="bg-[#262336] p-1 rounded-full flex text-sm font-bold text-slate-500 mb-4"><button @click="bookingSubTab = 'flight'" class="flex-1 py-2 rounded-full transition-all text-center" :class="bookingSubTab === 'flight' ? 'bg-[#3D3955] shadow text-[#F4CCA7]' : 'hover:text-slate-300'">航班</button><button @click="bookingSubTab = 'hotel'" class="flex-1 py-2 rounded-full transition-all text-center" :class="bookingSubTab === 'hotel' ? 'bg-[#3D3955] shadow text-[#F4CCA7]' : 'hover:text-slate-300'">住宿</button><button @click="bookingSubTab = 'car'" class="flex-1 py-2 rounded-full transition-all text-center" :class="bookingSubTab === 'car' ? 'bg-[#3D3955] shadow text-[#F4CCA7]' : 'hover:text-slate-300'">租車</button></div>
-                <div v-if="bookingSubTab === 'flight'" class="space-y-5 lg:grid lg:grid-cols-2 lg:gap-6 lg:space-y-0">
-                     <div v-for="(flight, index) in flightData" :key="flight.code" class="bg-[#3D3955] rounded-3xl soft-shadow overflow-hidden relative hover:-translate-y-1 transition-transform duration-300 group border border-white/5"><div class="h-2 w-full" :class="flight.color"></div><button @click="initEditFlight(index)" class="absolute top-4 right-4 bg-[#262336] text-slate-400 hover:bg-[#F4CCA7] hover:text-[#2F2B43] p-2 rounded-full transition-colors z-10 w-8 h-8 flex items-center justify-center"><i class="fa-solid fa-pen text-xs"></i></button><div class="p-5"><div class="flex justify-between items-center mb-6 pr-8"><span class="bg-[#262336] text-slate-300 px-2 py-1 rounded text-xs font-bold tracking-wider">{{ flight.airline }}</span><span class="text-slate-400 text-xs font-mono">{{ flight.date }}</span></div><div class="flex justify-between items-center text-center mb-6"><div><div class="text-3xl font-black text-slate-100">{{ flight.origin }}</div><div class="text-xs text-slate-400 mt-1">{{ flight.originCity }}</div><div class="text-lg font-bold text-slate-200 mt-1 bg-[#262336] px-2 rounded">{{ flight.depTime }}</div></div><div class="flex-1 px-4 flex flex-col items-center"><div class="text-xs text-slate-400 mb-1">{{ flight.duration }}</div><div class="w-full h-px bg-slate-600 relative flex items-center justify-center"><i class="fa-solid fa-plane text-slate-400 absolute bg-[#3D3955] px-2"></i></div><div class="text-xl font-black font-mono text-slate-300 mt-2">{{ flight.code }}</div></div><div><div class="text-3xl font-black text-slate-100">{{ flight.dest }}</div><div class="text-xs text-slate-400 mt-1">{{ flight.destCity }}</div><div class="text-lg font-bold text-slate-200 mt-1 bg-[#262336] px-2 rounded">{{ flight.arrTime }}</div></div></div><div class="flex justify-between text-xs text-slate-400 mb-4 px-2"><span><i class="fa-solid fa-plane-up mr-1"></i> {{ flight.aircraft }}</span><span><i class="fa-solid fa-suitcase mr-1"></i> {{ flight.baggage }}</span></div><div class="bg-[#262336] rounded-xl p-4 text-xs space-y-2 border border-white/5"><div class="flex justify-between border-b border-slate-600/50 pb-2 mb-2"><span class="text-slate-400">金額</span><span class="font-bold text-slate-200 text-sm">{{ flight.price }}</span></div><div class="grid grid-cols-2 gap-y-2 gap-x-4 text-slate-300"><div><span class="text-slate-500 block text-[10px]">購買日期</span>{{ flight.purchaseDate }}</div><div><span class="text-slate-500 block text-[10px]">購買平台</span><span class="truncate">{{ flight.platform }}</span></div><div><span class="text-slate-500 block text-[10px]">購買形式</span>{{ flight.type }}</div><div><span class="text-slate-500 block text-[10px]">行李額度</span>{{ flight.baggage }}</div></div><div v-if="flight.note" class="pt-2 mt-2 border-t border-slate-600/50 text-slate-400 bg-[#3D3955] p-2 rounded -mx-1"><i class="fa-solid fa-circle-info text-[#F4CCA7] mr-1"></i> {{ flight.note }}</div></div></div><div class="absolute -left-2 bottom-48 w-4 h-4 rounded-full bg-[#2F2B43]"></div><div class="absolute -right-2 bottom-48 w-4 h-4 rounded-full bg-[#2F2B43]"></div></div>
-                </div>
+                <div v-if="bookingSubTab === 'flight'" class="space-y-5 lg:grid lg:grid-cols-2 lg:gap-6 lg:space-y-0"><div v-for="(flight, index) in flightData" :key="flight.code" class="bg-[#3D3955] rounded-3xl soft-shadow overflow-hidden relative hover:-translate-y-1 transition-transform duration-300 group border border-white/5"><div class="h-2 w-full" :class="flight.color"></div><button @click="initEditFlight(index)" class="absolute top-4 right-4 bg-[#262336] text-slate-400 hover:bg-[#F4CCA7] hover:text-[#2F2B43] p-2 rounded-full transition-colors z-10 w-8 h-8 flex items-center justify-center"><i class="fa-solid fa-pen text-xs"></i></button><div class="p-5"><div class="flex justify-between items-center mb-6 pr-8"><span class="bg-[#262336] text-slate-300 px-2 py-1 rounded text-xs font-bold tracking-wider">{{ flight.airline }}</span><span class="text-slate-400 text-xs font-mono">{{ flight.date }}</span></div><div class="flex justify-between items-center text-center mb-6"><div><div class="text-3xl font-black text-slate-100">{{ flight.origin }}</div><div class="text-xs text-slate-400 mt-1">{{ flight.originCity }}</div><div class="text-lg font-bold text-slate-200 mt-1 bg-[#262336] px-2 rounded">{{ flight.depTime }}</div></div><div class="flex-1 px-4 flex flex-col items-center"><div class="text-xs text-slate-400 mb-1">{{ flight.duration }}</div><div class="w-full h-px bg-slate-600 relative flex items-center justify-center"><i class="fa-solid fa-plane text-slate-400 absolute bg-[#3D3955] px-2"></i></div><div class="text-xl font-black font-mono text-slate-300 mt-2">{{ flight.code }}</div></div><div><div class="text-3xl font-black text-slate-100">{{ flight.dest }}</div><div class="text-xs text-slate-400 mt-1">{{ flight.destCity }}</div><div class="text-lg font-bold text-slate-200 mt-1 bg-[#262336] px-2 rounded">{{ flight.arrTime }}</div></div></div><div class="flex justify-between text-xs text-slate-400 mb-4 px-2"><span><i class="fa-solid fa-plane-up mr-1"></i> {{ flight.aircraft }}</span><span><i class="fa-solid fa-suitcase mr-1"></i> {{ flight.baggage }}</span></div><div class="bg-[#262336] rounded-xl p-4 text-xs space-y-2 border border-white/5"><div class="flex justify-between border-b border-slate-600/50 pb-2 mb-2"><span class="text-slate-400">金額</span><span class="font-bold text-slate-200 text-sm">{{ flight.price }}</span></div><div class="grid grid-cols-2 gap-y-2 gap-x-4 text-slate-300"><div><span class="text-slate-500 block text-[10px]">購買日期</span>{{ flight.purchaseDate }}</div><div><span class="text-slate-500 block text-[10px]">購買平台</span><span class="truncate">{{ flight.platform }}</span></div><div><span class="text-slate-500 block text-[10px]">購買形式</span>{{ flight.type }}</div><div><span class="text-slate-500 block text-[10px]">行李額度</span>{{ flight.baggage }}</div></div><div v-if="flight.note" class="pt-2 mt-2 border-t border-slate-600/50 text-slate-400 bg-[#3D3955] p-2 rounded -mx-1"><i class="fa-solid fa-circle-info text-[#F4CCA7] mr-1"></i> {{ flight.note }}</div></div></div><div class="absolute -left-2 bottom-48 w-4 h-4 rounded-full bg-[#2F2B43]"></div><div class="absolute -right-2 bottom-48 w-4 h-4 rounded-full bg-[#2F2B43]"></div></div></div>
                 <div v-if="bookingSubTab === 'hotel'" class="space-y-4"><div v-for="(hotel, index) in accommodations" :key="index" class="bg-[#3D3955] rounded-2xl p-4 soft-shadow hover:bg-[#4E4868] transition-colors relative group border border-white/5"><div class="flex justify-between items-start mb-2"><span class="text-xs font-bold text-[#F4CCA7] bg-[#262336] px-2 py-1 rounded-lg">{{ hotel.city }}</span><button @click="editAccommodation(index)" class="text-slate-400 text-xs hover:text-white p-1"><i class="fa-solid fa-pen"></i></button></div><h4 class="font-bold text-slate-100 text-lg mb-1">{{ hotel.name }}</h4><p class="text-xs text-slate-400 flex items-center gap-1 mb-3"><i class="fa-solid fa-location-dot text-slate-500"></i> {{ hotel.address }}</p><div class="bg-[#262336] rounded-xl p-3 text-xs flex justify-between text-slate-300 border border-white/5"><div><span class="block text-[10px] text-slate-500 mb-0.5">Check-in</span><span class="font-bold">{{ hotel.checkIn }}</span></div><div class="text-right"><span class="block text-[10px] text-slate-500 mb-0.5">訂單編號</span><span class="font-mono">{{ hotel.ref }}</span></div></div><button @click="deleteAccommodation(index)" class="absolute top-4 right-8 text-red-300/50 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-opacity p-1"><i class="fa-solid fa-trash-can"></i></button></div><button @click="addNewAccommodation" class="w-full py-4 border-2 border-dashed border-slate-600 rounded-2xl text-slate-400 font-bold hover:bg-[#3D3955] hover:border-[#F4CCA7] hover:text-[#F4CCA7] transition-colors flex items-center justify-center gap-2"><i class="fa-solid fa-plus"></i> 新增住宿</button></div>
                 <div v-if="bookingSubTab === 'car'" class="space-y-4"><div v-if="!carRental.company && !carRental.carModel" class="bg-[#3D3955] rounded-2xl p-8 text-center soft-shadow border border-white/5"><div class="w-16 h-16 bg-[#262336] rounded-full flex items-center justify-center mx-auto mb-4 text-slate-500"><i class="fa-solid fa-car text-2xl"></i></div><p class="text-slate-400 text-sm mb-4">尚未設定租車資訊</p><button @click="editCar" class="bg-[#F4CCA7] text-[#2F2B43] px-6 py-2 rounded-xl text-sm font-bold shadow-lg active:scale-95 transition-transform">建立租車預訂</button></div><div v-else class="bg-[#3D3955] rounded-2xl p-5 soft-shadow relative group border border-white/5"><div class="flex justify-between items-start mb-4"><div><span class="text-[10px] font-bold text-[#2F2B43] bg-[#F4CCA7] px-2 py-1 rounded mb-2 inline-block">{{ carRental.company }}</span><h4 class="font-bold text-slate-100 text-xl">{{ carRental.carModel }}</h4></div><div class="text-right"><button @click="editCar" class="text-slate-400 hover:text-white p-1"><i class="fa-solid fa-pen"></i></button></div></div><div class="flex gap-4 text-xs text-slate-300 mb-4"><div class="flex-1 bg-[#262336] p-2 rounded-lg"><span class="block text-[10px] text-slate-500 mb-1">取車</span><div class="font-bold">{{ carRental.pickupDate }}</div><div class="text-[10px] truncate text-slate-400">{{ carRental.pickupLocation }}</div></div><div class="flex items-center text-slate-500"><i class="fa-solid fa-arrow-right"></i></div><div class="flex-1 bg-[#262336] p-2 rounded-lg"><span class="block text-[10px] text-slate-500 mb-1">還車</span><div class="font-bold">{{ carRental.returnDate }}</div><div class="text-[10px] truncate text-slate-400">{{ carRental.returnLocation }}</div></div></div><div class="flex justify-between items-center pt-3 border-t border-slate-600/50 text-xs"><span class="font-mono text-slate-500">Ref: {{ carRental.ref }}</span><span class="font-bold text-[#F4CCA7] text-sm">{{ carRental.price }}</span></div></div></div>
             </div>
@@ -292,6 +264,7 @@
     </main>
 
     <!-- MOBILE Bottom Navigation -->
+    <!-- 修正：safe-pb 確保底部內容不被 Home Bar 擋住 -->
     <nav class="lg:hidden fixed bottom-0 left-0 right-0 bg-[#3D3955] border-t border-slate-600 grid grid-cols-6 gap-0 items-center z-[999] h-20 pb-2 safe-pb">
         <button @click="currentTab = 'schedule'" class="nav-item flex flex-col items-center justify-center h-full gap-1 text-slate-400 hover:text-[#F4CCA7]" :class="{'nav-active': currentTab === 'schedule'}"><i class="fa-solid fa-calendar-day text-xl"></i><span class="text-xs font-medium">行程</span></button>
         <button @click="currentTab = 'bookings'" class="nav-item flex flex-col items-center justify-center h-full gap-1 text-slate-400 hover:text-[#F4CCA7]" :class="{'nav-active': currentTab === 'bookings'}"><i class="fa-solid fa-book-bookmark text-xl"></i><span class="text-xs font-medium">預訂</span></button>
@@ -424,12 +397,10 @@
 
             const initFirebase = () => {
                 try {
-                    // Simple check if config is valid (not empty)
                     if (Object.keys(firebaseConfig).length > 0) {
                         const app = initializeApp(firebaseConfig);
                         auth = getAuth(app);
                         db = getFirestore(app);
-                        // Fallback app ID if not provided in env
                         if (typeof __app_id !== 'undefined') appId = __app_id;
                         
                         isOnlineMode.value = true;
