@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <!-- 關鍵：viewport 設定，加入 viewport-fit=cover 以適應瀏海螢幕 -->
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <!-- 修改：user-scalable=yes 允許使用者縮放，maximum-scale=5.0 設定最大縮放倍率 -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes, viewport-fit=cover">
     <title>北國猛男哈米達 2026</title>
     
     <!-- Vue 3 -->
@@ -29,7 +30,7 @@
     <meta name="apple-mobile-web-app-title" content="北國猛男">
     <meta name="theme-color" content="#FFFFFF">
     
-    <!-- PWA Manifest (Data URI 內嵌版) -->
+    <!-- PWA Manifest -->
     <link rel="manifest" href="data:application/manifest+json;charset=utf-8,%7B%22name%22%3A%22%E5%8C%97%E5%9C%8B%E7%8C%9B%E7%94%B7%E5%93%88%E7%B1%B3%E9%81%94%22%2C%22short_name%22%3A%22%E5%8C%97%E5%9C%8B%E7%8C%9B%E7%94%B7%22%2C%22start_url%22%3A%22.%2Findex.html%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23F9FAFB%22%2C%22theme_color%22%3A%22%23F9FAFB%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22icon.jpg%22%2C%22sizes%22%3A%22192x192%22%2C%22type%22%3A%22image%2Fjpeg%22%7D%5D%7D">
 
     <style>
@@ -323,12 +324,12 @@
 
     <!-- MOBILE Bottom Navigation -->
     <nav class="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 grid grid-cols-6 gap-0 items-center z-[1001] h-20 pb-6 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
-        <button @click="currentTab = 'schedule'" class="nav-item flex flex-col items-center justify-center h-full gap-0.5 text-gray-400 hover:text-[#1D4ED8]" :class="{'nav-active': currentTab === 'schedule'}"><i class="fa-solid fa-calendar-day text-xl"></i><span class="text-[11px] font-bold">行程</span></button> <!-- text-xl, text-xs -->
-        <button @click="currentTab = 'bookings'" class="nav-item flex flex-col items-center justify-center h-full gap-0.5 text-gray-400 hover:text-[#1D4ED8]" :class="{'nav-active': currentTab === 'bookings'}"><i class="fa-solid fa-book-bookmark text-xl"></i><span class="text-[11px] font-bold">預訂</span></button>
-        <button @click="currentTab = 'expense'" class="nav-item flex flex-col items-center justify-center h-full gap-0.5 text-gray-400 hover:text-[#1D4ED8]" :class="{'nav-active': currentTab === 'expense'}"><i class="fa-solid fa-wallet text-xl"></i><span class="text-[11px] font-bold">帳務記帳</span></button> <!-- Modified text -->
-        <button @click="currentTab = 'journal'" class="nav-item flex flex-col items-center justify-center h-full gap-0.5 text-gray-400 hover:text-[#1D4ED8]" :class="{'nav-active': currentTab === 'journal'}"><i class="fa-solid fa-pen-nib text-xl"></i><span class="text-[11px] font-bold">日誌</span></button>
-        <button @click="currentTab = 'planning'" class="nav-item flex flex-col items-center justify-center h-full gap-0.5 text-gray-400 hover:text-[#1D4ED8]" :class="{'nav-active': currentTab === 'planning'}"><i class="fa-solid fa-suitcase text-xl"></i><span class="text-[11px] font-bold">準備</span></button>
-        <button @click="currentTab = 'members'" class="nav-item flex flex-col items-center justify-center h-full gap-0.5 text-gray-400 hover:text-[#1D4ED8]" :class="{'nav-active': currentTab === 'members'}"><i class="fa-solid fa-users text-xl"></i><span class="text-[11px] font-bold">成員</span></button>
+        <button @click="currentTab = 'schedule'" class="nav-item flex flex-col items-center justify-center h-full gap-0.5 text-gray-400 hover:text-[#1D4ED8]" :class="{'nav-active': currentTab === 'schedule'}"><i class="fa-solid fa-calendar-day text-xl"></i><span class="text-xs font-bold">行程</span></button> <!-- text-xl, text-xs -->
+        <button @click="currentTab = 'bookings'" class="nav-item flex flex-col items-center justify-center h-full gap-0.5 text-gray-400 hover:text-[#1D4ED8]" :class="{'nav-active': currentTab === 'bookings'}"><i class="fa-solid fa-book-bookmark text-xl"></i><span class="text-xs font-bold">預訂</span></button>
+        <button @click="currentTab = 'expense'" class="nav-item flex flex-col items-center justify-center h-full gap-0.5 text-gray-400 hover:text-[#1D4ED8]" :class="{'nav-active': currentTab === 'expense'}"><i class="fa-solid fa-wallet text-xl"></i><span class="text-xs font-bold">帳務記帳</span></button> <!-- Modified text -->
+        <button @click="currentTab = 'journal'" class="nav-item flex flex-col items-center justify-center h-full gap-0.5 text-gray-400 hover:text-[#1D4ED8]" :class="{'nav-active': currentTab === 'journal'}"><i class="fa-solid fa-pen-nib text-xl"></i><span class="text-xs font-bold">日誌</span></button>
+        <button @click="currentTab = 'planning'" class="nav-item flex flex-col items-center justify-center h-full gap-0.5 text-gray-400 hover:text-[#1D4ED8]" :class="{'nav-active': currentTab === 'planning'}"><i class="fa-solid fa-suitcase text-xl"></i><span class="text-xs font-bold">準備</span></button>
+        <button @click="currentTab = 'members'" class="nav-item flex flex-col items-center justify-center h-full gap-0.5 text-gray-400 hover:text-[#1D4ED8]" :class="{'nav-active': currentTab === 'members'}"><i class="fa-solid fa-users text-xl"></i><span class="text-xs font-bold">成員</span></button>
     </nav>
 
     <!-- MODALS -->
@@ -342,11 +343,7 @@
                     <input v-model="modalEvent.time" type="time" class="bg-gray-100 text-gray-800 p-3 rounded-xl outline-none border border-gray-200">
                     <select v-model="modalEvent.type" class="flex-1 bg-gray-100 text-gray-800 p-3 rounded-xl outline-none border border-gray-200"><option value="sight">景點</option><option value="food">美食</option><option value="transport">交通</option><option value="hotel">住宿</option></select>
                 </div>
-                 <div class="flex gap-2"><input v-model="modalEvent.location" type="text" placeholder="地點 (選填)" class="flex-1 bg-gray-100 text-gray-800 p-3 rounded-xl outline-none text-sm border border-gray-200"><input v-model="modalEvent.address" type="text" placeholder="地址" class="flex-1 bg-gray-100 text-gray-800 p-3 rounded-xl outline-none text-sm border border-gray-200"></div>
-                 <div class="grid grid-cols-2 gap-2">
-                    <input v-model="modalEvent.googleMapUrl" type="text" placeholder="Google Map 連結" class="bg-gray-100 text-gray-800 p-3 rounded-xl outline-none text-sm border border-gray-200">
-                    <input v-model="modalEvent.naverMapUrl" type="text" placeholder="Naver Map 連結" class="bg-gray-100 text-gray-800 p-3 rounded-xl outline-none text-sm border border-gray-200">
-                </div>
+                 <div class="flex gap-2"><input v-model="modalEvent.location" type="text" placeholder="地點 (選填)" class="flex-1 bg-gray-100 text-gray-800 p-3 rounded-xl outline-none text-sm border border-gray-200"><input v-model.number="modalEvent.cost" type="number" placeholder="預算" class="w-24 bg-gray-100 text-gray-800 p-3 rounded-xl outline-none text-sm border border-gray-200"></div>
                 <input v-model="modalEvent.note" type="text" placeholder="備註 (選填)" class="w-full bg-gray-100 text-gray-800 p-3 rounded-xl outline-none text-sm border border-gray-200">
             </div>
             <div class="flex gap-3 mt-6"><button @click="showModal = false" class="flex-1 py-3 rounded-xl bg-gray-200 text-gray-600 font-bold hover:bg-gray-300 transition-colors">取消</button><button @click="saveEvent" class="flex-1 py-3 rounded-xl bg-[#1D4ED8] text-white font-bold shadow-lg hover:bg-blue-700 transition-colors">保存</button></div>
@@ -547,7 +544,7 @@
 
     <!-- Image Modal -->
     <div v-if="showImageModal" class="fixed inset-0 bg-black/90 z-[110] flex items-center justify-center p-4 backdrop-blur-sm" @click="showImageModal = false">
-        <img :src="currentImage" class="max-w-full max-h-[85vh] rounded-lg shadow-2xl" @click.stop>
+        <img :src="currentImage" class="max-w-full max-h-[85vh] rounded-lg shadow-2xl transition-transform duration-300" @click.stop>
         <button class="absolute top-4 right-4 text-white text-2xl p-2 hover:text-gray-300"><i class="fa-solid fa-xmark"></i></button>
     </div>
 
@@ -563,38 +560,33 @@
     createApp({
         setup() {
             // --- Helper: Image Reader (No Compression) ---
-            const handleExpenseImage = async (e, isEdit = false) => { 
-                const f = e.target.files[0]; 
-                if(f) { 
-                    try { 
-                        const reader = new FileReader();
-                        reader.onload = (e) => {
-                            if (isEdit) editingExpense.value.image = e.target.result; 
-                            else newExpense.value.image = e.target.result; 
-                        };
-                        reader.readAsDataURL(f);
-                    } catch (err) { 
-                        alert("圖片處理失敗"); 
-                    } 
-                }
+            // 統一使用這個函式讀取圖片，不進行壓縮
+            const handleImageUpload = (file, callback) => {
+                if (!file) return;
+                const reader = new FileReader();
+                reader.onload = (e) => callback(e.target.result);
+                reader.readAsDataURL(file);
             };
 
-            const handleMemberAvatar = async (e) => { 
-                const f = e.target.files[0]; 
-                if(f) { 
-                    try { 
-                         const reader = new FileReader();
-                        reader.onload = (e) => {
-                            editingMember.value.avatar = e.target.result;
-                        };
-                        reader.readAsDataURL(f);
-                    } catch (err) { 
-                        alert("圖片處理失敗"); 
-                    } 
-                } 
+            // Expense Image Handler
+            const handleExpenseImage = (e, isEdit = false) => { 
+                const f = e.target.files[0];
+                handleImageUpload(f, (result) => {
+                    if (isEdit) editingExpense.value.image = result; 
+                    else newExpense.value.image = result; 
+                });
             };
 
-            const handleJournalImages = async (e) => { 
+            // Member Avatar Handler
+            const handleMemberAvatar = (e) => { 
+                const f = e.target.files[0];
+                handleImageUpload(f, (result) => {
+                    editingMember.value.avatar = result;
+                });
+            };
+
+            // Journal Images Handler
+            const handleJournalImages = (e) => { 
                 const files = e.target.files; 
                 if (!files.length) return; 
                 if (journalForm.value.photos.length + files.length > 5) { 
@@ -602,11 +594,9 @@
                     return; 
                 } 
                 for (let i = 0; i < files.length; i++) { 
-                    const reader = new FileReader();
-                    reader.onload = (e) => {
-                        journalForm.value.photos.push(e.target.result);
-                    };
-                    reader.readAsDataURL(files[i]);
+                    handleImageUpload(files[i], (result) => {
+                        journalForm.value.photos.push(result);
+                    });
                 } 
             };
 
@@ -658,7 +648,6 @@
             const editingMemberIndex = ref(-1);
             const showExpenseEditModal = ref(false);
             const editingExpenseIndex = ref(-1);
-            // const editingExpense = ref({}); // Removed duplicate declaration
             const showPasswordModal = ref(false);
             const passwordInput = ref('');
             const passwordShake = ref(false);
